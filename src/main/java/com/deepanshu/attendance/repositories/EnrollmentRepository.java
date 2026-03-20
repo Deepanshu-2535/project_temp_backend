@@ -10,4 +10,5 @@ import java.util.List;
 public interface EnrollmentRepository extends JpaRepository<Enrollment,Long> {
     @Query("SELECT e.subject FROM Enrollment e WHERE e.student.rollNo = :rollNo")
     List<Subject> findSubjectByStudent_RollNo(Long rollNo);
+    Long countBySubject(Subject subject);
 }
