@@ -9,7 +9,6 @@ import java.util.UUID;
 public interface StudentService {
     Long getStudentRollNoByUserId(UUID id);
     Student getStudentByRollNo(Long rollNo);
-    List<StudentOverviewResponse.SubjectAttendance> getSubjectWiseAttendance(Long rollNo);
     StudentOverviewResponse getOverview(Long rollNo);
 
 }

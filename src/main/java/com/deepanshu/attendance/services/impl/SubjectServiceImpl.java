@@ -31,18 +31,18 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Long getTotalClasses(Subject subject) {
+    public Long getTotalClassesOfASubject(Subject subject) {
         return attendanceSessionRepository.countBySubject(subject);
     }
 
     @Override
-    public Long getAttended(Subject subject, Long rollNo) {
+    public Long getNoOfCLassesOfASubjectAttendedByAStudent(Subject subject, Long rollNo) {
         return attendanceRecordRepository.countByAttendanceSession_SubjectAndStudent_RollNo(subject,rollNo);
     }
 
     @Override
     public List<DetailedAttendanceResponse.AttendanceHistory> getAttendanceHistory(Subject subject, Long rollNo) {
-        List<AttendanceSession> listOfTotalClasses = attendanceSessionRepository.findBySubject(subject);
+        List<AttendanceSession> listOfTotalClasses = attendanceSessionRepository.findBySubject_SubjectCode(subject.getSubjectCode());
         List<AttendanceRecord> listOfAttendedClasses = attendanceRecordRepository.findByAttendanceSession_SubjectAndStudent_RollNo(subject,rollNo);
         return listOfTotalClasses.stream()
                 .map(session->{

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SubjectService {
     Subject getSubjectFromSubjectCode(String subjectCode);
-    Long getTotalClasses(Subject subject);
-    Long getAttended(Subject subject, Long rollNo);
+    Long getTotalClassesOfASubject(Subject subject);
+    Long getNoOfCLassesOfASubjectAttendedByAStudent(Subject subject, Long rollNo);
     List<DetailedAttendanceResponse.AttendanceHistory> getAttendanceHistory(Subject subject, Long rollNo);
 }

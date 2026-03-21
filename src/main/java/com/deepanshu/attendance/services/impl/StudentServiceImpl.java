@@ -9,6 +9,7 @@ import com.deepanshu.attendance.repositories.AttendanceSessionRepository;
 import com.deepanshu.attendance.repositories.EnrollmentRepository;
 import com.deepanshu.attendance.repositories.StudentRepository;
 import com.deepanshu.attendance.services.StudentService;
+import com.deepanshu.attendance.services.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +23,7 @@ public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
-    private final AttendanceSessionRepository attendanceSessionRepository;
-    private final AttendanceRecordRepository attendanceRecordRepository;
+    private final SubjectService subjectService;
 
     @Override
     public Long getStudentRollNoByUserId(UUID id) {
@@ -36,14 +36,12 @@ public class StudentServiceImpl implements StudentService {
         return studentRepository.findById(rollNo).orElseThrow(()->new ResourceNotFoundException("Student not found"));
     }
 
-
-    @Override
-    public List<StudentOverviewResponse.SubjectAttendance> getSubjectWiseAttendance(Long rollNo) {
+    private List<StudentOverviewResponse.SubjectAttendance> getSubjectWiseAttendance(Long rollNo) {
         List<Subject> enrolledSubjects = enrollmentRepository.findSubjectByStudent_RollNo(rollNo);
         return enrolledSubjects.stream()
                 .map(subject -> {
-                    Long totalAttendance = attendanceSessionRepository.countBySubject(subject);
-                    Long attended = attendanceRecordRepository.countByAttendanceSession_SubjectAndStudent_RollNo(subject,rollNo);
+                    Long totalAttendance = subjectService.getTotalClassesOfASubject(subject);
+                    Long attended = subjectService.getNoOfCLassesOfASubjectAttendedByAStudent(subject,rollNo);
                     return StudentOverviewResponse.SubjectAttendance.builder()
                             .subjectCode(subject.getSubjectCode())
                             .subjectName(subject.getSubjectName())

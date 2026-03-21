@@ -33,4 +33,13 @@ public class ErrorController {
         return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalStateException(IllegalStateException exception){
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(exception.getMessage())
+                .build();
+        return new ResponseEntity<>(response,HttpStatus.CONFLICT);
+    }
+
 }

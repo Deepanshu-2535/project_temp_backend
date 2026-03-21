@@ -27,7 +27,7 @@ public class AuthController {
         AuthResponse response = AuthResponse.builder()
                 .token(token)
                 .role(userDetails.getAuthorities().iterator().next().getAuthority().replace("ROLE_",""))
-                .expiresIn(86400)
+                .expiresIn(2592000)
                 .build();
         return ResponseEntity.ok(response);
 

@@ -57,8 +57,8 @@ public class StudentController {
         Subject subject = subjectService.getSubjectFromSubjectCode(subjectCode);
         UUID id = userService.getUserIdFromRequest(request);
         Long rollNo = studentService.getStudentRollNoByUserId(id);
-        Long totalClasses = subjectService.getTotalClasses(subject);
-        Long attended = subjectService.getAttended(subject,rollNo);
+        Long totalClasses = subjectService.getTotalClassesOfASubject(subject);
+        Long attended = subjectService.getNoOfCLassesOfASubjectAttendedByAStudent(subject,rollNo);
         List<DetailedAttendanceResponse.AttendanceHistory> history = subjectService.getAttendanceHistory(subject,rollNo);
         DetailedAttendanceResponse response = DetailedAttendanceResponse.builder()
                 .subjectCode(subject.getSubjectCode())
