@@ -1,10 +1,10 @@
 package com.deepanshu.attendance.controllers;
 
-import com.deepanshu.attendance.domain.dtos.DetailedAttendanceResponse;
-import com.deepanshu.attendance.domain.dtos.StudentOverviewResponse;
-import com.deepanshu.attendance.domain.dtos.StudentProfileResponse;
+import com.deepanshu.attendance.domain.dtos.*;
+import com.deepanshu.attendance.domain.entities.AttendanceRecord;
 import com.deepanshu.attendance.domain.entities.Student;
 import com.deepanshu.attendance.domain.entities.Subject;
+import com.deepanshu.attendance.services.AttendanceSessionService;
 import com.deepanshu.attendance.services.StudentService;
 import com.deepanshu.attendance.services.SubjectService;
 import com.deepanshu.attendance.services.UserService;
@@ -12,10 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +26,7 @@ public class StudentController {
     private final StudentService studentService;
     private final UserService userService;
     private final SubjectService subjectService;
+    private final AttendanceSessionService attendanceSessionService;
 
     @GetMapping(path = "/attendance/overview")
     public ResponseEntity<StudentOverviewResponse> overViewController(HttpServletRequest request){
@@ -68,6 +66,14 @@ public class StudentController {
                 .history(history)
                 .build();
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(path = "/attendance/scan")
+    public ResponseEntity<ScanResponse> scanController(@RequestBody ScanRequest scanRequest, HttpServletRequest request){
+        UUID id = userService.getUserIdFromRequest(request);
+        Long rollNo = studentService.getStudentRollNoByUserId(id);
+        AttendanceRecord markedAttendance = attendanceSessionService.markAttendance(scanRequest.getToken(), rollNo);
+        ScanResponse response = ScanResponse.
     }
 }
 

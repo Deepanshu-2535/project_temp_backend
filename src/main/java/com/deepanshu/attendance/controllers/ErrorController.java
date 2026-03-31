@@ -1,7 +1,9 @@
 package com.deepanshu.attendance.controllers;
 
 import com.deepanshu.attendance.domain.dtos.ApiErrorResponse;
+import com.deepanshu.attendance.exceptions.InvalidSessionException;
 import com.deepanshu.attendance.exceptions.ResourceNotFoundException;
+import com.deepanshu.attendance.exceptions.StudentNotEnrolledException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -16,30 +18,48 @@ import java.util.List;
 @RestControllerAdvice
 public class ErrorController {
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(BadCredentialsException exception){
+    public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(BadCredentialsException exception) {
         ApiErrorResponse errorResponse = ApiErrorResponse.builder()
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .message("Incorrect username or password")
                 .build();
-        return new ResponseEntity<>(errorResponse,HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFoundException(ResourceNotFoundException exception){
+    public ResponseEntity<ApiErrorResponse> handleNotFoundException(ResourceNotFoundException exception) {
         ApiErrorResponse response = ApiErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(exception.getMessage())
                 .build();
-        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ApiErrorResponse> handleIllegalStateException(IllegalStateException exception){
+    public ResponseEntity<ApiErrorResponse> handleIllegalStateException(IllegalStateException exception) {
         ApiErrorResponse response = ApiErrorResponse.builder()
                 .status(HttpStatus.CONFLICT.value())
                 .message(exception.getMessage())
                 .build();
-        return new ResponseEntity<>(response,HttpStatus.CONFLICT);
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidSessionException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidSessionException(InvalidSessionException exception) {
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .status(HttpStatus.CONTINUE.value())
+                .message(exception.getMessage())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(StudentNotEnrolledException.class)
+    public ResponseEntity<ApiErrorResponse> handleStudentNotEnrolledException(StudentNotEnrolledException exception) {
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .message(exception.getMessage())
+                .build();
+        return new ResponseEntity<>(response,HttpStatus.FORBIDDEN);
     }
 
 }

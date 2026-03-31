@@ -5,13 +5,17 @@ import com.deepanshu.attendance.domain.entities.AttendanceRecord;
 import com.deepanshu.attendance.domain.entities.AttendanceSession;
 import com.deepanshu.attendance.domain.entities.Student;
 import com.deepanshu.attendance.enums.Status;
+import com.deepanshu.attendance.exceptions.InvalidSessionException;
 import com.deepanshu.attendance.exceptions.ResourceNotFoundException;
+import com.deepanshu.attendance.exceptions.StudentNotEnrolledException;
 import com.deepanshu.attendance.repositories.AttendanceRecordRepository;
 import com.deepanshu.attendance.repositories.AttendanceSessionRepository;
 import com.deepanshu.attendance.repositories.EnrollmentRepository;
 import com.deepanshu.attendance.services.AttendanceSessionService;
+import com.deepanshu.attendance.services.StudentService;
 import com.deepanshu.attendance.services.SubjectService;
 import com.deepanshu.attendance.services.TeacherService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,7 @@ public class AttendanceSessionServiceImpl implements AttendanceSessionService {
 
     private final SubjectService subjectService;
     private final TeacherService teacherService;
+    private final StudentService studentService;
     private final AttendanceSessionRepository attendanceSessionRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final AttendanceRecordRepository attendanceRecordRepository;
@@ -74,7 +79,7 @@ public class AttendanceSessionServiceImpl implements AttendanceSessionService {
     @Override
     public AttendanceSession createNewSession(String teacherId, String subjectCode) {
         Optional<AttendanceSession> activeSession = attendanceSessionRepository.findBySubject_SubjectCodeAndIsActiveTrue(subjectCode);
-        if(activeSession.isPresent()){
+        if (activeSession.isPresent()) {
             throw new IllegalStateException("A session is already active for this subject");
         }
         AttendanceSession newSession = AttendanceSession.builder()
@@ -86,7 +91,8 @@ public class AttendanceSessionServiceImpl implements AttendanceSessionService {
         attendanceSessionRepository.save(newSession);
         String qrToken = generateToken(newSession.getId());
         newSession.setCurrentToken(qrToken);
-        newSession.setTokenExpiresAt(LocalDateTime.now().plusSeconds(20));
+        newSession.setTokenExpiresAt(LocalDateTime.now()
+                .plusSeconds(20));
         return attendanceSessionRepository.save(newSession);
     }
 
@@ -104,25 +110,60 @@ public class AttendanceSessionServiceImpl implements AttendanceSessionService {
         String token = generateToken(sessionId);
         AttendanceSession session = getSessionFromSessionId(sessionId);
         session.setCurrentToken(token);
-        session.setTokenExpiresAt(LocalDateTime.now().plusSeconds(20));
+        session.setTokenExpiresAt(LocalDateTime.now()
+                .plusSeconds(20));
         attendanceSessionRepository.save(session);
         return getSessionFromSessionId(sessionId);
     }
 
+    @Override
+    public AttendanceRecord markAttendance(String token, Long rollNo) {
+        AttendanceSession session = getSessionFromToken(token);
+        Student student = studentService.getStudentByRollNo(rollNo);
+        if (!(session.getIsActive() && session.getTokenExpiresAt()
+                .isAfter(LocalDateTime.now()))) {
+            throw new InvalidSessionException("Session is Expired or invalid");
+        }
+        if (enrollmentRepository.findBySubjectAndStudent_RollNo(session.getSubject(), rollNo)
+                .isEmpty()) {
+            throw new StudentNotEnrolledException("Student not enrolled");
+        }
+        Optional<AttendanceRecord> existing = attendanceRecordRepository.findByAttendanceSessionAndStudent(session, student);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        AttendanceRecord newRecord = AttendanceRecord.builder()
+                .attendanceSession(session)
+                .student(student)
+                .scannedAt(LocalDateTime.now())
+                .build();
+        return attendanceRecordRepository.save(newRecord);
+    }
+
+    private AttendanceSession getSessionFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        Long sessionId = Long.parseLong(claims.getSubject());
+        return attendanceSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
+    }
 
     private String generateToken(Long sessionId) {
-        Map<String,Object> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(sessionId.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+20000))
+                .setExpiration(new Date(System.currentTimeMillis() + 20000))
                 .signWith(getSigningKey())
                 .compact();
 
     }
 
-    private Key getSigningKey(){
+    private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 }
