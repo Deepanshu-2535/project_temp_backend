@@ -111,7 +111,7 @@ public class AttendanceSessionServiceImpl implements AttendanceSessionService {
         AttendanceSession session = getSessionFromSessionId(sessionId);
         session.setCurrentToken(token);
         session.setTokenExpiresAt(LocalDateTime.now()
-                .plusSeconds(20));
+                .plusSeconds(100));
         attendanceSessionRepository.save(session);
         return getSessionFromSessionId(sessionId);
     }

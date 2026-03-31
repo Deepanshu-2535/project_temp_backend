@@ -29,14 +29,14 @@ public class StudentController {
     private final AttendanceSessionService attendanceSessionService;
 
     @GetMapping(path = "/attendance/overview")
-    public ResponseEntity<StudentOverviewResponse> overViewController(HttpServletRequest request){
+    public ResponseEntity<StudentOverviewResponse> overViewController(HttpServletRequest request) {
         UUID id = userService.getUserIdFromRequest(request);
         Long rollNo = studentService.getStudentRollNoByUserId(id);
         return ResponseEntity.ok(studentService.getOverview(rollNo));
     }
 
     @GetMapping(path = "/profile")
-    public ResponseEntity<StudentProfileResponse> profileController(HttpServletRequest request){
+    public ResponseEntity<StudentProfileResponse> profileController(HttpServletRequest request) {
         UUID id = userService.getUserIdFromRequest(request);
         Long rollNo = studentService.getStudentRollNoByUserId(id);
         Student student = studentService.getStudentByRollNo(rollNo);
@@ -51,13 +51,13 @@ public class StudentController {
     }
 
     @GetMapping(path = "/attendance/subject/{subjectCode}")
-    public ResponseEntity<DetailedAttendanceResponse> detailedAttendanceController(@PathVariable String subjectCode, HttpServletRequest request){
+    public ResponseEntity<DetailedAttendanceResponse> detailedAttendanceController(@PathVariable String subjectCode, HttpServletRequest request) {
         Subject subject = subjectService.getSubjectFromSubjectCode(subjectCode);
         UUID id = userService.getUserIdFromRequest(request);
         Long rollNo = studentService.getStudentRollNoByUserId(id);
         Long totalClasses = subjectService.getTotalClassesOfASubject(subject);
-        Long attended = subjectService.getNoOfCLassesOfASubjectAttendedByAStudent(subject,rollNo);
-        List<DetailedAttendanceResponse.AttendanceHistory> history = subjectService.getAttendanceHistory(subject,rollNo);
+        Long attended = subjectService.getNoOfCLassesOfASubjectAttendedByAStudent(subject, rollNo);
+        List<DetailedAttendanceResponse.AttendanceHistory> history = subjectService.getAttendanceHistory(subject, rollNo);
         DetailedAttendanceResponse response = DetailedAttendanceResponse.builder()
                 .subjectCode(subject.getSubjectCode())
                 .subjectName(subject.getSubjectName())
@@ -69,11 +69,15 @@ public class StudentController {
     }
 
     @PostMapping(path = "/attendance/scan")
-    public ResponseEntity<ScanResponse> scanController(@RequestBody ScanRequest scanRequest, HttpServletRequest request){
+    public ResponseEntity<ScanResponse> scanController(@RequestBody ScanRequest scanRequest, HttpServletRequest request) {
         UUID id = userService.getUserIdFromRequest(request);
         Long rollNo = studentService.getStudentRollNoByUserId(id);
         AttendanceRecord markedAttendance = attendanceSessionService.markAttendance(scanRequest.getToken(), rollNo);
-        ScanResponse response = ScanResponse.
+        ScanResponse response = ScanResponse.builder()
+                .markedAt(markedAttendance.getScannedAt())
+                .subjectName(markedAttendance.getAttendanceSession().getSubject().getSubjectName())
+                .build();
+        return ResponseEntity.ok(response);
     }
 }
 
