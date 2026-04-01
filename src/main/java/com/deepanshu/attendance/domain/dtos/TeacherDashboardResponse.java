@@ -13,6 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TeacherDashboardResponse {
+    String title;
+    String firstName;
+    String lastName;
     Long noOfSubjects;
     Long totalStudents;
     Long averageAttendancePercentage;

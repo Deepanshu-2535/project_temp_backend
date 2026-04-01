@@ -40,6 +40,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public TeacherDashboardResponse getDashboardResponse(String teacherId) {
+        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(()->new ResourceNotFoundException("Teacher not found"));
         Long noOfSubjects = subjectRepository.countByTeacher_TeacherId(teacherId);
         List<Subject> listOfSubjects = subjectRepository.findByTeacher_TeacherId(teacherId);
         Long totalNoOfStudents = enrollmentRepository.countDistinctStudentsByTeacherId(teacherId);
@@ -56,6 +57,9 @@ public class TeacherServiceImpl implements TeacherService {
         Long attendancePercentage = totalSessions==0?0L: ((attendedSessions*100) / totalSessions);
         List<TeacherDashboardResponse.SessionHistory> sessionHistories = getSessionHistories(teacherId);
         return TeacherDashboardResponse.builder()
+                .title(teacher.getTitle())
+                .firstName(teacher.getFirstName())
+                .lastName(teacher.getLastName())
                 .noOfSubjects(noOfSubjects)
                 .totalStudents(totalNoOfStudents)
                 .averageAttendancePercentage(attendancePercentage)
