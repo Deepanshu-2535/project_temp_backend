@@ -18,7 +18,7 @@ public class SessionDetails {
     String subjectName;
     LocalDate sessionDate;
     Long totalNoOfStudents;
-    Long noOFStudentsPresent;
+    Long noOfStudentsPresent;
     List<Attendance> attendances;
 
     @Data

@@ -17,7 +17,6 @@ import com.deepanshu.attendance.services.SubjectService;
 import com.deepanshu.attendance.services.TeacherService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -71,7 +70,7 @@ public class AttendanceSessionServiceImpl implements AttendanceSessionService {
                         .getSubjectName())
                 .sessionDate(session.getSessionDate())
                 .totalNoOfStudents(enrollmentRepository.countBySubject(session.getSubject()))
-                .noOFStudentsPresent(attendanceRecordRepository.countByAttendanceSession(session))
+                .noOfStudentsPresent(attendanceRecordRepository.countByAttendanceSession(session))
                 .attendances(attendances)
                 .build();
     }
