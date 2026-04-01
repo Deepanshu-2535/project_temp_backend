@@ -15,9 +15,9 @@ import com.deepanshu.attendance.services.AttendanceSessionService;
 import com.deepanshu.attendance.services.StudentService;
 import com.deepanshu.attendance.services.SubjectService;
 import com.deepanshu.attendance.services.TeacherService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -141,11 +141,16 @@ public class AttendanceSessionServiceImpl implements AttendanceSessionService {
     }
 
     private AttendanceSession getSessionFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = null;
+        try {
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new InvalidSessionException("Session is expired");
+        }
         Long sessionId = Long.parseLong(claims.getSubject());
         return attendanceSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found"));

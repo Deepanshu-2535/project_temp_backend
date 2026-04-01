@@ -4,7 +4,6 @@ import com.deepanshu.attendance.domain.dtos.DetailedAttendanceResponse;
 import com.deepanshu.attendance.domain.entities.AttendanceRecord;
 import com.deepanshu.attendance.domain.entities.AttendanceSession;
 import com.deepanshu.attendance.domain.entities.Subject;
-import com.deepanshu.attendance.enums.Role;
 import com.deepanshu.attendance.enums.Status;
 import com.deepanshu.attendance.exceptions.ResourceNotFoundException;
 import com.deepanshu.attendance.repositories.AttendanceRecordRepository;
@@ -12,7 +11,6 @@ import com.deepanshu.attendance.repositories.AttendanceSessionRepository;
 import com.deepanshu.attendance.repositories.SubjectRepository;
 import com.deepanshu.attendance.services.SubjectService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,7 +40,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public List<DetailedAttendanceResponse.AttendanceHistory> getAttendanceHistory(Subject subject, Long rollNo) {
-        List<AttendanceSession> listOfTotalClasses = attendanceSessionRepository.findBySubject_SubjectCode(subject.getSubjectCode());
+        List<AttendanceSession> listOfTotalClasses = attendanceSessionRepository.findBySubject_SubjectCodeOrderBySessionDateDesc(subject.getSubjectCode());
         List<AttendanceRecord> listOfAttendedClasses = attendanceRecordRepository.findByAttendanceSession_SubjectAndStudent_RollNo(subject,rollNo);
         return listOfTotalClasses.stream()
                 .map(session->{
