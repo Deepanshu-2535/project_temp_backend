@@ -8,7 +8,6 @@ import com.deepanshu.attendance.exceptions.ResourceNotFoundException;
 import com.deepanshu.attendance.repositories.*;
 import com.deepanshu.attendance.services.TeacherService;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -70,7 +69,7 @@ public class TeacherServiceImpl implements TeacherService {
 
 
     private List<TeacherDashboardResponse.SessionHistory> getSessionHistories(String teacherId) {
-        List<AttendanceSession> sessionsByTeacher = attendanceSessionRepository.findByTeacher_TeacherId(teacherId);
+        List<AttendanceSession> sessionsByTeacher = attendanceSessionRepository.findByTeacher_TeacherIdOrderBySessionDateDesc(teacherId);
         return sessionsByTeacher.stream()
                 .map(session -> TeacherDashboardResponse.SessionHistory.builder()
                         .sessionId(session.getId())

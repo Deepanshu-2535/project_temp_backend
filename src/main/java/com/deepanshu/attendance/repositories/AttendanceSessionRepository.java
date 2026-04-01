@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface AttendanceSessionRepository extends JpaRepository<AttendanceSession,Long> {
     Long countBySubject(Subject subject);
     List<AttendanceSession> findBySubject_SubjectCodeOrderBySessionDateDesc(String subjectCode);
-    List<AttendanceSession> findByTeacher_TeacherId(String teacherId);
+    List<AttendanceSession> findByTeacher_TeacherIdOrderBySessionDateDesc(String teacherId);
     Optional<AttendanceSession> findBySubject_SubjectCodeAndIsActiveTrue(String subjectCode);
 }
