@@ -79,9 +79,7 @@ public class AttendanceSessionServiceImpl implements AttendanceSessionService {
     @Override
     public AttendanceSession createNewSession(String teacherId, String subjectCode) {
         Optional<AttendanceSession> activeSession = attendanceSessionRepository.findBySubject_SubjectCodeAndIsActiveTrue(subjectCode);
-        if (activeSession.isPresent()) {
-            throw new IllegalStateException("A session is already active for this subject");
-        }
+        activeSession.ifPresent(attendanceSession -> stopSession(attendanceSession.getId()));
         AttendanceSession newSession = AttendanceSession.builder()
                 .subject(subjectService.getSubjectFromSubjectCode(subjectCode))
                 .teacher(teacherService.getTeacherFromTeacherId(teacherId))
