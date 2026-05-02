@@ -6,6 +6,9 @@ import com.deepanshu.attendance.domain.entities.Subject;
 import java.util.List;
 
 public interface SubjectService {
+    Subject save(Subject subject);
+    List<Subject> findAll();
+    void delete(String subjectCode);
     Subject getSubjectFromSubjectCode(String subjectCode);
     Long getTotalClassesOfASubject(Subject subject);
     Long getNoOfCLassesOfASubjectAttendedByAStudent(Subject subject, Long rollNo);

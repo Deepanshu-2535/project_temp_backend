@@ -4,8 +4,6 @@ import com.deepanshu.attendance.domain.dtos.StudentOverviewResponse;
 import com.deepanshu.attendance.domain.entities.Student;
 import com.deepanshu.attendance.domain.entities.Subject;
 import com.deepanshu.attendance.exceptions.ResourceNotFoundException;
-import com.deepanshu.attendance.repositories.AttendanceRecordRepository;
-import com.deepanshu.attendance.repositories.AttendanceSessionRepository;
 import com.deepanshu.attendance.repositories.EnrollmentRepository;
 import com.deepanshu.attendance.repositories.StudentRepository;
 import com.deepanshu.attendance.services.StudentService;
@@ -24,6 +22,21 @@ public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final SubjectService subjectService;
+
+    @Override
+    public Student save(Student student) {
+        return studentRepository.save(student);
+    }
+
+    @Override
+    public List<Student> findAll() {
+        return studentRepository.findAll();
+    }
+
+    @Override
+    public void delete(Long rollNo) {
+        studentRepository.deleteById(rollNo);
+    }
 
     @Override
     public Long getStudentRollNoByUserId(UUID id) {

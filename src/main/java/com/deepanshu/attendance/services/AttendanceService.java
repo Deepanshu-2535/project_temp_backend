@@ -4,7 +4,7 @@ import com.deepanshu.attendance.domain.dtos.SessionDetails;
 import com.deepanshu.attendance.domain.entities.AttendanceRecord;
 import com.deepanshu.attendance.domain.entities.AttendanceSession;
 
-public interface AttendanceSessionService {
+public interface AttendanceService {
     AttendanceSession getSessionFromSessionId(Long sessionId);
     SessionDetails getDetailedSessionDTO(Long sessionId);
     AttendanceSession createNewSession(String teacherId,String subjectCode);

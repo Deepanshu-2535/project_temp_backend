@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface StudentService {
+    Student save(Student student);
+    List<Student> findAll();
+    void delete(Long rollNo);
     Long getStudentRollNoByUserId(UUID id);
     Student getStudentByRollNo(Long rollNo);
     StudentOverviewResponse getOverview(Long rollNo);

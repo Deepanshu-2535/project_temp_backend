@@ -25,6 +25,21 @@ public class TeacherServiceImpl implements TeacherService {
     private final AttendanceSessionRepository attendanceSessionRepository;
 
     @Override
+    public Teacher save(Teacher teacher) {
+        return teacherRepository.save(teacher);
+    }
+
+    @Override
+    public List<Teacher> findAll() {
+        return teacherRepository.findAll();
+    }
+
+    @Override
+    public void delete(String teacherId) {
+        teacherRepository.deleteById(teacherId);
+    }
+
+    @Override
     public String getTeacherIdFromUserId(UUID id) {
         Optional<Teacher> teacher = teacherRepository.findByUser_Id(id);
         return teacher.orElseThrow(() -> new ResourceNotFoundException("Teacher Not Found"))
@@ -39,21 +54,22 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public TeacherDashboardResponse getDashboardResponse(String teacherId) {
-        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(()->new ResourceNotFoundException("Teacher not found"));
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
         Long noOfSubjects = subjectRepository.countByTeacher_TeacherId(teacherId);
         List<Subject> listOfSubjects = subjectRepository.findByTeacher_TeacherId(teacherId);
         Long totalNoOfStudents = enrollmentRepository.countDistinctStudentsByTeacherId(teacherId);
         long totalSessions = listOfSubjects.stream()
-                .mapToLong(subject->{
+                .mapToLong(subject -> {
                     Long noOfStudentsInASubject = enrollmentRepository.countBySubject(subject);
                     Long sessionsOfASubject = attendanceSessionRepository.countBySubject(subject);
-                    return noOfStudentsInASubject*sessionsOfASubject;
+                    return noOfStudentsInASubject * sessionsOfASubject;
                 })
                 .sum();
         long attendedSessions = listOfSubjects.stream()
                 .mapToLong(attendanceRecordRepository::countByAttendanceSession_Subject)
                 .sum();
-        Long attendancePercentage = totalSessions==0?0L: ((attendedSessions*100) / totalSessions);
+        Long attendancePercentage = totalSessions == 0 ? 0L : ((attendedSessions * 100) / totalSessions);
         List<TeacherDashboardResponse.SessionHistory> sessionHistories = getSessionHistories(teacherId);
         return TeacherDashboardResponse.builder()
                 .title(teacher.getTitle())
@@ -65,7 +81,6 @@ public class TeacherServiceImpl implements TeacherService {
                 .sessionHistory(sessionHistories)
                 .build();
     }
-
 
 
     private List<TeacherDashboardResponse.SessionHistory> getSessionHistories(String teacherId) {

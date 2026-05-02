@@ -4,7 +4,7 @@ import com.deepanshu.attendance.domain.dtos.*;
 import com.deepanshu.attendance.domain.entities.AttendanceRecord;
 import com.deepanshu.attendance.domain.entities.Student;
 import com.deepanshu.attendance.domain.entities.Subject;
-import com.deepanshu.attendance.services.AttendanceSessionService;
+import com.deepanshu.attendance.services.AttendanceService;
 import com.deepanshu.attendance.services.StudentService;
 import com.deepanshu.attendance.services.SubjectService;
 import com.deepanshu.attendance.services.UserService;
@@ -26,7 +26,7 @@ public class StudentController {
     private final StudentService studentService;
     private final UserService userService;
     private final SubjectService subjectService;
-    private final AttendanceSessionService attendanceSessionService;
+    private final AttendanceService attendanceService;
 
     @GetMapping(path = "/attendance/overview")
     public ResponseEntity<StudentOverviewResponse> overViewController(HttpServletRequest request) {
@@ -72,7 +72,7 @@ public class StudentController {
     public ResponseEntity<ScanResponse> scanController(@RequestBody ScanRequest scanRequest, HttpServletRequest request) {
         UUID id = userService.getUserIdFromRequest(request);
         Long rollNo = studentService.getStudentRollNoByUserId(id);
-        AttendanceRecord markedAttendance = attendanceSessionService.markAttendance(scanRequest.getToken(), rollNo);
+        AttendanceRecord markedAttendance = attendanceService.markAttendance(scanRequest.getToken(), rollNo);
         ScanResponse response = ScanResponse.builder()
                 .markedAt(markedAttendance.getScannedAt())
                 .subjectName(markedAttendance.getAttendanceSession().getSubject().getSubjectName())

@@ -4,7 +4,7 @@ import com.deepanshu.attendance.domain.dtos.*;
 import com.deepanshu.attendance.domain.entities.AttendanceSession;
 import com.deepanshu.attendance.domain.entities.Subject;
 import com.deepanshu.attendance.domain.entities.Teacher;
-import com.deepanshu.attendance.services.AttendanceSessionService;
+import com.deepanshu.attendance.services.AttendanceService;
 import com.deepanshu.attendance.services.TeacherService;
 import com.deepanshu.attendance.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +25,7 @@ public class TeacherController {
 
     private final UserService userService;
     private final TeacherService teacherService;
-    private final AttendanceSessionService attendanceSessionService;
+    private final AttendanceService attendanceService;
 
     @GetMapping(path = "/dashboard")
     public ResponseEntity<TeacherDashboardResponse> dashboardController(HttpServletRequest request) {
@@ -52,13 +51,13 @@ public class TeacherController {
 
     @GetMapping(path = "/sessions/{sessionId}/details")
     public ResponseEntity<SessionDetails> sessionDetailsController(@PathVariable Long sessionId) {
-        SessionDetails response = attendanceSessionService.getDetailedSessionDTO(sessionId);
+        SessionDetails response = attendanceService.getDetailedSessionDTO(sessionId);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping(path = "/sessions/start")
     public ResponseEntity<SessionStartResponse> sessionStartController(HttpServletRequest request, @RequestBody SessionStartRequest sessionStartRequest) {
-        AttendanceSession session = attendanceSessionService.createNewSession(sessionStartRequest.getTeacherId(), sessionStartRequest.getSubjectCode());
+        AttendanceSession session = attendanceService.createNewSession(sessionStartRequest.getTeacherId(), sessionStartRequest.getSubjectCode());
         SessionStartResponse response = SessionStartResponse.builder()
                 .sessionId(session.getId())
                 .currentToken(session.getCurrentToken())
@@ -69,13 +68,13 @@ public class TeacherController {
 
     @PatchMapping(path = "/sessions/{sessionId}/stop")
     public ResponseEntity<Void> sessionStopController(@PathVariable Long sessionId){
-        attendanceSessionService.stopSession(sessionId);
+        attendanceService.stopSession(sessionId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(path = "/sessions/{sessionId}/token")
     public ResponseEntity<QrTokenResponse> sessionTokenController(@PathVariable Long sessionId){
-        AttendanceSession session = attendanceSessionService.getNewToken(sessionId);
+        AttendanceSession session = attendanceService.getNewToken(sessionId);
         QrTokenResponse response = QrTokenResponse.builder()
                 .token(session.getCurrentToken())
                 .expiresAt(session.getTokenExpiresAt())

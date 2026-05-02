@@ -11,7 +11,7 @@ import com.deepanshu.attendance.exceptions.StudentNotEnrolledException;
 import com.deepanshu.attendance.repositories.AttendanceRecordRepository;
 import com.deepanshu.attendance.repositories.AttendanceSessionRepository;
 import com.deepanshu.attendance.repositories.EnrollmentRepository;
-import com.deepanshu.attendance.services.AttendanceSessionService;
+import com.deepanshu.attendance.services.AttendanceService;
 import com.deepanshu.attendance.services.StudentService;
 import com.deepanshu.attendance.services.SubjectService;
 import com.deepanshu.attendance.services.TeacherService;
@@ -29,7 +29,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class AttendanceSessionServiceImpl implements AttendanceSessionService {
+public class AttendanceServiceImpl implements AttendanceService {
 
     @Value("${jwt.qr.secret}")
     private String secretKey;

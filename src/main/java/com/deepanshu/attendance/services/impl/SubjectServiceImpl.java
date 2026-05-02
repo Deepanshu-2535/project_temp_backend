@@ -24,6 +24,21 @@ public class SubjectServiceImpl implements SubjectService {
     private final AttendanceRecordRepository attendanceRecordRepository;
 
     @Override
+    public Subject save(Subject subject) {
+        return subjectRepository.save(subject);
+    }
+
+    @Override
+    public List<Subject> findAll() {
+        return subjectRepository.findAll();
+    }
+
+    @Override
+    public void delete(String subjectCode) {
+        subjectRepository.deleteById(subjectCode);
+    }
+
+    @Override
     public Subject getSubjectFromSubjectCode(String subjectCode) {
         return subjectRepository.findById(subjectCode).orElseThrow(()->new ResourceNotFoundException("Subject Not Found"));
     }
