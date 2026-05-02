@@ -5,9 +5,11 @@ import com.deepanshu.attendance.exceptions.ResourceNotFoundException;
 import com.deepanshu.attendance.repositories.EnrollmentRepository;
 import com.deepanshu.attendance.services.EnrollmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class EnrollmentServiceImpl implements EnrollmentService {
 
