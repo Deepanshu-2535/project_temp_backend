@@ -40,6 +40,9 @@ public class DataSeeder implements CommandLineRunner {
         User teacherUser3 = createUser("teacher3@college.edu");
         User teacherUser4 = createUser("teacher4@college.edu");
         User teacherUser5 = createUser("teacher5@college.edu");
+        User admin = User.builder().email("admin@college.edu").passwordHash(passwordEncoder.encode("password123")).role(Role.ADMIN).build();
+        userRepository.save(admin);
+        System.out.println("Admin created");
 
         Teacher teacher1 = createTeacher("TCH001", teacherUser1, "Dr.", "Rajesh",  "Kumar",   "Professor",            "Computer Science");
         Teacher teacher2 = createTeacher("TCH002", teacherUser2, "Dr.", "Priya",   "Sharma",  "Associate Professor",  "Computer Science");
