@@ -2,6 +2,7 @@ package com.deepanshu.attendance.controllers.admin;
 
 import com.deepanshu.attendance.domain.dtos.AdminEnrollmentDto;
 import com.deepanshu.attendance.domain.dtos.AdminStudentDto;
+import com.deepanshu.attendance.domain.dtos.EnrollmentListResponse;
 import com.deepanshu.attendance.domain.entities.Enrollment;
 import com.deepanshu.attendance.services.EnrollmentService;
 import com.deepanshu.attendance.services.StudentService;
@@ -21,10 +22,10 @@ public class AdminEnrollmentsController {
     private final StudentService studentService;
 
     @GetMapping
-    public ResponseEntity<List<AdminEnrollmentDto>> getEnrollment() {
+    public ResponseEntity<List<EnrollmentListResponse>> getEnrollment() {
         List<Enrollment> enrollments = enrollmentService.findAll();
-        List<AdminEnrollmentDto> adminEnrollmentDtos = enrollments.stream()
-                .map(AdminEnrollmentsController::getEnrollmentDto)
+        List<EnrollmentListResponse> adminEnrollmentDtos = enrollments.stream()
+                .map(AdminEnrollmentsController::getEnrollmentListItem)
                 .toList();
         return ResponseEntity.ok(adminEnrollmentDtos);
     }
@@ -52,9 +53,20 @@ public class AdminEnrollmentsController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> deleteEnrollment(@PathVariable Long id){
+    public ResponseEntity<Void> deleteEnrollment(@PathVariable Long id) {
         enrollmentService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent()
+                .build();
+    }
+
+    private static EnrollmentListResponse getEnrollmentListItem(Enrollment enrollment) {
+        return EnrollmentListResponse.builder()
+                .id(enrollment.getId())
+                .subjectCode(enrollment.getSubject()
+                        .getSubjectCode())
+                .rollNo(enrollment.getStudent()
+                        .getRollNo())
+                .build();
     }
 
     private static AdminEnrollmentDto getEnrollmentDto(Enrollment enrollment) {
